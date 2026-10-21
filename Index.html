@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DedeFood - ShopeeFood Clone</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,sans-serif}
+body{background:#f5f5f5;padding-bottom:85px}
+.top{background:#ee4d2d;color:#fff;padding:12px 15px;position:sticky;top:0;z-index:10}
+.top1{display:flex;justify-content:space-between;font-size:14px}
+.search-bar{background:#fff;border-radius:8px;margin:10px 0;padding:10px 12px;display:flex;gap:8px;color:#999}
+.search-bar input{border:none;width:100%;outline:none;color:#333}
+.banner{margin:0 15px;background:linear-gradient(90deg,#ff6a00,#ee4d2d);border-radius:12px;padding:15px;color:#fff;display:flex;justify-content:space-between}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:15px;background:#fff;margin-top:10px}
+.cat-grid div{text-align:center;font-size:12px}.cat-grid i{width:48px;height:48px;background:#fff2ee;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;color:#ee4d2d;font-size:20px}
+.filter{display:flex;gap:8px;padding:12px 15px;overflow:auto;white-space:nowrap;background:#fff;border-top:1px solid #eee;border-bottom:1px solid #eee}
+.filter span{border:1px solid #ddd;padding:6px 12px;border-radius:20px;font-size:12px}.filter .active{background:#ee4d2d;color:#fff;border-color:#ee4d2d}
+.resto{background:#fff;margin:8px 15px;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex}
+.resto img{width:110px;height:110px;object-fit:cover}.resto .info{padding:10px;flex:1}
+.badge{background:#ffeae5;color:#ee4d2d;font-size:10px;padding:2px 6px;border-radius:4px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:8px 0;z-index:20}
+.bottom div{text-align:center;font-size:11px;color:#999}.bottom .active{color:#ee4d2d}
+.cart-bar{position:fixed;bottom:65px;left:15px;right:15px;background:#ee4d2d;color:#fff;border-radius:30px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;display:none;z-index:19}
+#adminPage{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:50;padding:20px;overflow:auto}
+#adminPage input, #adminPage button{padding:10px;margin:5px 0;width:100%;border-radius:8px;border:1px solid #ddd}
+#adminPage button{background:#ee4d2d;color:#fff;border:none;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="top">
+<div class="top1"><span><i class="fa-solid fa-location-dot"></i> Kirim ke - Jakarta | WA: 089519286925</span><span onclick="openAdmin()" style="background:rgba(0,0,0,.2);padding:4px 8px;border-radius:10px">ADMIN</span></div>
+<div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input id="cari" oninput="search()" placeholder="Cari ayam geprek, seblak, keju lapis..."></div>
+</div>
+<div class="banner"><div><b>Gratis Ongkir Xtra</b><br><small>Min. Rp30RB - Khusus Pelajar</small></div><i class="fa-solid fa-motorcycle" style="font-size:36px"></i></div>
+<div class="cat-grid"><div><i class="fa-solid fa-utensils"></i>Semua</div><div><i class="fa-solid fa-fire"></i>Terlaris</div><div><i class="fa-solid fa-percent"></i>Promo</div><div><i class="fa-solid fa-bowl-rice"></i>Nasi</div></div>
+<div class="filter"><span class="active">Rekomendasi</span><span>Terdekat</span><span>Rating 4.5+</span><span>Gratis Ongkir</span></div>
+<div id="restoList"></div>
+<div class="cart-bar" id="cartBar"><div><i class="fa-solid fa-basket-shopping"></i> <span id="cItem">0</span> item | <b id="cHarga">Rp 0</b></div><button onclick="checkout()" style="background:#fff;color:#ee4d2d;border:none;padding:6px 15px;border-radius:20px;font-weight:bold">Checkout WA</button></div>
+<div class="bottom"><div><i class="fa-solid fa-house"></i><br>Beranda</div><div class="active"><i class="fa-solid fa-utensils"></i><br>ShopeeFood</div><div><i class="fa-solid fa-receipt"></i><br>Pesanan</div><div onclick="openAdmin()"><i class="fa-solid fa-user-gear"></i><br>Admin</div></div>
+
+<div id="adminPage">
+<h2>Admin DedeFood</h2><p style="font-size:13px;color:#666">WA Tujuan: 089519286925 (6289519286925)</p><hr style="margin:10px 0">
+<input id="nama" placeholder="Nama menu, ex: Keju Lapis Lumer"><input id="harga" type="number" placeholder="Harga, ex: 35000"><input id="resto" placeholder="Nama resto"><button onclick="tambah()">+ Tambah Menu</button><button onclick="closeAdmin()" style="background:#333">Tutup & Lihat Web</button><hr><div id="adminList"></div>
+</div>
+
+<script>
+const defaultMenus=[
+{name:"Ayam Geprek Keju Lumer",harga:18000,resto:"Ayam Geprek Dede - Tebet",img:"https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=300",promo:"Gratis Ongkir + Diskon 40%",rating:"4.8",jarak:"0.8km"},
+{name:"Seblak Jeletot Level 3",harga:12000,resto:"Seblak Jeletot Mpok Nini",img:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300",promo:"Diskon 60% s/d 15RB",rating:"4.9",jarak:"1.2km"},
+{name:"Keju Lapis Original",harga:35000,resto:"Keju Lapis Lumer 88",img:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300",promo:"Promo Buy 1 Get 1",rating:"4.7",jarak:"2.1km"},
+{name:"Keju Lapis Coklat Lumer",harga:38000,resto:"Keju Lapis Lumer 88",img:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300",promo:"Gratis Ongkir",rating:"4.7",jarak:"2.1km"},
+];
+let data=JSON.parse(localStorage.getItem('dedefood_v2')||'null')||defaultMenus;
+let cartCount=0,cartTotal=0,filtered=data;
+function render(){
+ const list=document.getElementById('restoList'); list.innerHTML='';
+ filtered.forEach((r,i)=>{
+  list.innerHTML+=`<div class="resto"><img src="${r.img}"><div class="info"><b>${r.resto}</b><br><span style="font-size:13px">${r.name}</span><br><small>⭐ ${r.rating} • ${r.jarak} • 25 mnt</small><br><span class="badge">${r.promo}</span><br><b style="color:#ee4d2d">Rp ${r.harga.toLocaleString()}</b> <button onclick="addCart(${r.harga})" style="float:right;border:1px solid #ee4d2d;color:#ee4d2d;background:#fff;padding:4px 10px;border-radius:12px">+ Tambah</button></div></div>`;
+ });
+ const al=document.getElementById('adminList'); al.innerHTML=data.map((d,i)=>`<div style="border:1px solid #eee;padding:8px;border-radius:8px;margin:5px 0;display:flex;justify-content:space-between"><span><b>${d.name}</b><br>Rp ${d.harga} - ${d.resto}</span><button onclick="hapus(${i})" style="width:60px;background:#999">Hapus</button></div>`).join('');
+ localStorage.setItem('dedefood_v2',JSON.stringify(data));
+}
+function search(){const q=document.getElementById('cari').value.toLowerCase(); filtered=data.filter(d=>d.name.toLowerCase().includes(q)||d.resto.toLowerCase().includes(q)); render();}
+function addCart(h){cartCount++;cartTotal+=h;document.getElementById('cItem').innerText=cartCount;document.getElementById('cHarga').innerText="Rp "+cartTotal.toLocaleString();document.getElementById('cartBar').style.display='flex';}
+function checkout(){if(cartCount==0) return alert('Keranjang kosong min!');const pesan=`Halo DedeFood, saya mau pesan ${cartCount} item total Rp ${cartTotal.toLocaleString()}%0A%0A${filtered.map(f=>`- ${f.name}`).join('%0A')}%0A%0ATolong diproses ya min!`;window.open("https://wa.me/6289519286925?text="+pesan);}
+function openAdmin(){document.getElementById('adminPage').style.display='block';}function closeAdmin(){document.getElementById('adminPage').style.display='none';render();}
+function tambah(){const n=document.getElementById('nama').value,h=document.getElementById('harga').value,r=document.getElementById('resto').value;if(!n||!h) return alert('Isi nama & harga');data.unshift({name:n,harga:parseInt(h),resto:r||"DedeFood",img:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300",promo:"Menu Baru",rating:"4.8",jarak:"0.5km"});filtered=data;render();document.getElementById('nama').value='';document.getElementById('harga').value='';alert('Berhasil!');}
+function hapus(i){if(confirm('Hapus menu ini?')){data.splice(i,1);filtered=data;render();}}
+render();
+</script>
+</body>
+</html>
